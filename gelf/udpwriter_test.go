@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -31,10 +31,13 @@ func sendAndRecv(msgData string, compress CompressType) (*Message, error) {
 		return nil, fmt.Errorf("NewReader: %s", err)
 	}
 
-	w, err := NewUDPWriter(r.Addr())
+	ww, err := NewUDPWriter(r.Addr())
 	if err != nil {
 		return nil, fmt.Errorf("NewUDPWriter: %s", err)
 	}
+	wType := reflect.TypeOf(ww)
+	fmt.Printf("%v\n", wType)
+	w, _ := reflect.ValueOf(ww).Interface().(*UDPWriter)
 	w.CompressionType = compress
 
 	if _, err = w.Write([]byte(msgData)); err != nil {
@@ -51,10 +54,13 @@ func sendAndRecvMsg(msg *Message, compress CompressType) (*Message, error) {
 		return nil, fmt.Errorf("NewReader: %s", err)
 	}
 
-	w, err := NewUDPWriter(r.Addr())
+	ww, err := NewUDPWriter(r.Addr())
 	if err != nil {
 		return nil, fmt.Errorf("NewUDPWriter: %s", err)
 	}
+	wType := reflect.TypeOf(ww)
+	fmt.Printf("%v\n", wType)
+	w, _ := reflect.ValueOf(ww).Interface().(*UDPWriter)
 	w.CompressionType = compress
 
 	if err = w.WriteMessage(msg); err != nil {
@@ -241,11 +247,14 @@ func BenchmarkWriteBestSpeed(b *testing.B) {
 	if err != nil {
 		b.Fatalf("NewReader: %s", err)
 	}
-	go io.Copy(ioutil.Discard, r)
-	w, err := NewUDPWriter(r.Addr())
+	go io.Copy(io.Discard, r)
+	ww, err := NewUDPWriter(r.Addr())
 	if err != nil {
 		b.Fatalf("NewUDPWriter: %s", err)
 	}
+	wType := reflect.TypeOf(ww)
+	fmt.Printf("%v\n", wType)
+	w, _ := reflect.ValueOf(ww).Interface().(*UDPWriter)
 	w.CompressionLevel = flate.BestSpeed
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -267,11 +276,14 @@ func BenchmarkWriteNoCompression(b *testing.B) {
 	if err != nil {
 		b.Fatalf("NewReader: %s", err)
 	}
-	go io.Copy(ioutil.Discard, r)
-	w, err := NewUDPWriter(r.Addr())
+	go io.Copy(io.Discard, r)
+	ww, err := NewUDPWriter(r.Addr())
 	if err != nil {
 		b.Fatalf("NewUDPWriter: %s", err)
 	}
+	wType := reflect.TypeOf(ww)
+	fmt.Printf("%v\n", wType)
+	w, _ := reflect.ValueOf(ww).Interface().(*UDPWriter)
 	w.CompressionLevel = flate.NoCompression
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -293,11 +305,14 @@ func BenchmarkWriteDisableCompressionCompletely(b *testing.B) {
 	if err != nil {
 		b.Fatalf("NewReader: %s", err)
 	}
-	go io.Copy(ioutil.Discard, r)
-	w, err := NewUDPWriter(r.Addr())
+	go io.Copy(io.Discard, r)
+	ww, err := NewUDPWriter(r.Addr())
 	if err != nil {
 		b.Fatalf("NewUDPWriter: %s", err)
 	}
+	wType := reflect.TypeOf(ww)
+	fmt.Printf("%v\n", wType)
+	w, _ := reflect.ValueOf(ww).Interface().(*UDPWriter)
 	w.CompressionType = CompressNone
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -319,11 +334,14 @@ func BenchmarkWriteDisableCompressionAndPreencodeExtra(b *testing.B) {
 	if err != nil {
 		b.Fatalf("NewReader: %s", err)
 	}
-	go io.Copy(ioutil.Discard, r)
-	w, err := NewUDPWriter(r.Addr())
+	go io.Copy(io.Discard, r)
+	ww, err := NewUDPWriter(r.Addr())
 	if err != nil {
 		b.Fatalf("NewUDPWriter: %s", err)
 	}
+	wType := reflect.TypeOf(ww)
+	fmt.Printf("%v\n", wType)
+	w, _ := reflect.ValueOf(ww).Interface().(*UDPWriter)
 	w.CompressionType = CompressNone
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

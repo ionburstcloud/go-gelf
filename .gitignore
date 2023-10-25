@@ -2,3 +2,5 @@
 .#*
 .idea
 *.swp
+gelf/server.crt
+gelf/server.key

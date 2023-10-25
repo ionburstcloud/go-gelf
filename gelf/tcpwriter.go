@@ -20,7 +20,7 @@ type TCPWriter struct {
 	ReconnectDelay time.Duration
 }
 
-func NewTCPWriter(addr string) (*TCPWriter, error) {
+func NewTCPWriter(addr string) (Writer, error) {
 	var err error
 	w := new(TCPWriter)
 	w.MaxReconnect = DefaultMaxReconnect
@@ -86,7 +86,7 @@ func (w *TCPWriter) writeToSocketWithReconnectAttempts(zBytes []byte) (n int, er
 		if w.conn != nil {
 			n, err = w.conn.Write(zBytes)
 		} else {
-			err = fmt.Errorf("Connection was nil, will attempt reconnect")
+			err = fmt.Errorf("connection was nil, will attempt reconnect")
 		}
 		if err != nil {
 			time.Sleep(w.ReconnectDelay * time.Second)
@@ -98,7 +98,7 @@ func (w *TCPWriter) writeToSocketWithReconnectAttempts(zBytes []byte) (n int, er
 	w.mu.Unlock()
 
 	if i > w.MaxReconnect {
-		return 0, fmt.Errorf("Maximum reconnection attempts was reached; giving up")
+		return 0, fmt.Errorf("maximum reconnection attempts was reached; giving up")
 	}
 	if errConn != nil {
 		return 0, fmt.Errorf("Write Failed: %s\nReconnection failed: %s", err, errConn)

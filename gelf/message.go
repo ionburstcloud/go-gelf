@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -141,7 +142,7 @@ func constructMessage(p []byte, hostname string, facility string, file string, l
 		Host:     hostname,
 		Short:    string(short),
 		Full:     string(full),
-		TimeUnix: float64(time.Now().UnixNano()) / float64(time.Second),
+		TimeUnix: makeTimestamp(),
 		Level:    6, // info
 		Facility: facility,
 		Extra: map[string]interface{}{
@@ -151,4 +152,16 @@ func constructMessage(p []byte, hostname string, facility string, file string, l
 	}
 
 	return m
+}
+
+func makeTimestamp() float64 {
+	var millisecInt int64 = time.Now().UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
+	var secF float64 = float64(millisecInt) / float64(1000)
+	var secString = fmt.Sprintf("%.3f", secF)
+	result, err := strconv.ParseFloat(secString, 64)
+	if err != nil {
+		fmt.Printf("ParseFloat error: %s\n", err.Error())
+	}
+
+	return result
 }

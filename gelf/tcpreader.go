@@ -9,7 +9,7 @@ import (
 )
 
 type TCPReader struct {
-	listener *net.TCPListener
+	listener net.Listener
 	conn     net.Conn
 	messages chan []byte
 }
